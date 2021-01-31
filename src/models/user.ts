@@ -1,11 +1,11 @@
-var moment = require('moment');
+import moment from 'moment';
 
-module.exports = class User {
+export class User {
   id;
   registeredTime;
   channels = [];
 
-  constructor(id) {
+  constructor(id: string) {
     this.id = id;
     this.registeredTime = moment();
   }
