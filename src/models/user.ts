@@ -1,9 +1,10 @@
 import moment from 'moment';
+import { Channel } from './channel';
 
 export class User {
-  id;
-  registeredTime;
-  channels = [];
+  public id: string;
+  public registeredTime: moment.Moment;
+  public channels: Channel[] = [];
 
   constructor(id: string) {
     this.id = id;

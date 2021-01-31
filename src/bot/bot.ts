@@ -1,8 +1,7 @@
-import { exception } from 'console';
 import Discord from 'discord.js';
-import { CMD_REGISTER, CMD_CHECK, CMD_RANK } from '../constants';
+import { CMD_REGISTER, CMD_CHECK, CMD_RANK, CMD_PING } from '../constants';
 import moment from 'moment';
-import { User, Channel } from '../models';
+import { User } from '../models';
 
 export default class DiscordBot {
   private _prefix: string = "!";
@@ -14,9 +13,27 @@ export default class DiscordBot {
   }
 
   private initEventHandlers(): void {
-    this._client.on("ready", () => {});
+    this._client.on("channelCreate", () => {});
     
-    this._client.on("voiceStateUpdate", async (preVoiceState, newVoiceState) => {
+    this._client.on("voiceStateUpdate", this.onVoiceStateUpdate);
+    
+    this._client.on("message", async message => this.onMessage);
+  }
+
+  public async startBot(botToken: string): Promise<boolean> {
+    if (!botToken || botToken.trim() === "")
+      throw "Bot Token required";    
+    
+    try {
+      await this._client.login(botToken);
+      return true;
+    } 
+    catch (error) {
+      throw error;
+    }
+  }
+
+  private async onVoiceStateUpdate(preVoiceState: Discord.VoiceState, newVoiceState: Discord.VoiceState): Promise<void> {
       // console.log("VOICE STATE\n", newVoiceState.toJSON());
       // console.log("GUID\n", newVoiceState.guild.toJSON());
       // console.log("CHANNELS\n", newVoiceState.guild.channels.cache.toJSON());
@@ -44,46 +61,32 @@ export default class DiscordBot {
       //   channelId = preVoiceState.channelID;
       //   console.log(`${displayName} left ${channelName} at ${now.format('MMMM Do YYYY, h:mm:ss a')}`);
       // }
-    });
-    
-    this._client.on("message", async message => {
-      if (message.author.bot) return;
-      if (message.content.startsWith("hi")) message.reply("shut up");
-      if (message.content.startsWith("aw")) message.reply("you gonna cry?");
-      if (!message.content.startsWith(this._prefix)) return;
-    
-      const commandBody = message.content.slice(this._prefix.length);
-      const args = commandBody.split(" ");
-      const command = args.shift()?.toLowerCase();
-    
-      switch (command?.toUpperCase()) {
-        case "ping":
-          const timeTaken = message.createdTimestamp - Date.now();
-          message.channel.send(`this message had a latency of ${timeTaken}ms.`);
-          break;
-        case CMD_REGISTER:
-          this.registerUser(message);
-          break;
-        case CMD_CHECK:
-          this.checkUser(message);
-          break;
-        case CMD_RANK:
-        default:
-          message.reply("Man oh man, I'm too dumb to understand that command.");
-      }
-    });
   }
 
-  public async startBot(botToken: string): Promise<boolean> {
-    if (!botToken || botToken.trim() === "")
-      throw "Bot Token required";    
-    
-    try {
-      await this._client.login(botToken);
-      return true;
-    } 
-    catch (error) {
-      throw error;
+  private async onMessage(message: Discord.Message): Promise<void> {
+    if (message.author.bot) return;
+    if (message.content.startsWith("hi")) message.reply("shut up");
+    if (message.content.startsWith("aw")) message.reply("you gonna cry?");
+    if (!message.content.startsWith(this._prefix)) return;
+  
+    const commandBody = message.content.slice(this._prefix.length);
+    const args = commandBody.split(" ");
+    const command = args.shift()?.toLowerCase();
+  
+    switch (command?.toUpperCase()) {
+      case CMD_PING:
+        const timeTaken = message.createdTimestamp - Date.now();
+        message.channel.send(`this message had a latency of ${timeTaken}ms.`);
+        break;
+      case CMD_REGISTER:
+        this.registerUser(message);
+        break;
+      case CMD_CHECK:
+        this.checkUser(message);
+        break;
+      case CMD_RANK:
+      default:
+        message.reply("Man oh man, I'm too dumb to understand that command.");
     }
   }
 
