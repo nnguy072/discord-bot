@@ -4,8 +4,7 @@ It's a discord bot. It's suppose to keep track of how long you've been on discor
 
 ## Commands
 
-| Commands      | Status        | Description                                     |
-| ------------- | ------------- | ----------------------------------------------- |
-| !ping         | Done          | Returns the latency between you and the server  |
-| !register     | In Progress   | Registers you to keep track of your time        |
-| !check        | In Progress   | Tells you how long you've been registered for   |
+| Commands                      | Status        | Description                                     |
+| ----------------------------- | ------------- | ----------------------------------------------- |
+| !ping                         | Done          | Returns the latency between you and the server  |
+| !kudo @user \<message\>       | In Progress   | Show appreciation to another user on the server |
